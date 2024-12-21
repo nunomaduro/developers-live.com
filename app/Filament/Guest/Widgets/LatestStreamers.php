@@ -4,6 +4,7 @@ namespace App\Filament\Guest\Widgets;
 
 use App\Enums\StreamerStatus;
 use App\Models\Streamer;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Tables;
@@ -38,14 +39,21 @@ class LatestStreamers extends BaseWidget
             ])->headerActions([
                 Action::make('Submit a Streamer')
                     ->form([
-                        TextInput::make('name')
-                            ->required(),
-                        TextInput::make('twitch_username')
-                            ->required()
-                            ->unique(
-                                'streamers',
-                                'twitch_username',
-                            ),
+                        Section::make()
+                            ->icon('heroicon-o-microphone')
+                            ->heading('Streamer Information')
+                            ->description('Enter the streamer information')
+                            ->schema([
+                                TextInput::make('name')
+                                    ->required(),
+                                TextInput::make('twitch_username')
+                                    ->required()
+                                    ->unique(
+                                        'streamers',
+                                        'twitch_username',
+                                    ),
+                            ])
+
                     ])->action(function (array $data) {
                         Streamer::create([
                             ...$data,

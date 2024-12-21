@@ -15,25 +15,31 @@ class StreamerResource extends Resource
 {
     protected static ?string $model = Streamer::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-microphone';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')
-                    ->required(),
-                Forms\Components\TextInput::make('twitch_username')
-                    ->required()
-                    ->unique(
-                        'streamers',
-                        'twitch_username',
-                        ignoreRecord: true,
-                    ),
-                Forms\Components\Select::make('status')
-                    ->required()
-                    ->options(StreamerStatus::class)
-                    ->default(StreamerStatus::PendingApproval),
+                Forms\Components\Section::make()
+                    ->icon('heroicon-o-microphone')
+                    ->heading('Streamer Information')
+                    ->description('Enter the streamer information')
+                    ->schema([
+                        Forms\Components\TextInput::make('name')
+                            ->required(),
+                        Forms\Components\TextInput::make('twitch_username')
+                            ->required()
+                            ->unique(
+                                'streamers',
+                                'twitch_username',
+                                ignoreRecord: true,
+                            ),
+                        Forms\Components\Select::make('status')
+                            ->required()
+                            ->options(StreamerStatus::class)
+                            ->default(StreamerStatus::PendingApproval),
+                    ])
             ]);
     }
 

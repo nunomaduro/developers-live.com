@@ -15,7 +15,7 @@ class StreamerResource extends Resource
 {
     protected static ?string $model = Streamer::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-microphone';
 
     public static function form(Form $form): Form
     {

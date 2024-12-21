@@ -29,7 +29,8 @@ class LatestStreamers extends BaseWidget
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('twitch_username')
-                    ->url(fn (Streamer $streamer) => 'https://www.twitch.tv/'.$streamer->twitch_username)
+                    ->url(fn(Streamer $streamer) => 'https://www.twitch.tv/' . $streamer->twitch_username)
+                    ->openUrlInNewTab()
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\IconColumn::make('is_live')

@@ -45,17 +45,21 @@ class LatestStreamers extends BaseWidget
                                 'streamers',
                                 'twitch_username',
                             ),
-                    ])->action(function (array $data) {
-                        Streamer::create([
-                            ...$data,
-                            'status' => StreamerStatus::PendingApproval,
-                            'is_live' => false,
-                        ]);
-                    })->after(function () {
-                        Notification::make()
-                            ->title('Your streamer has been submitted for approval.')
-                            ->success()
-                            ->send();
+                    ])
+                    ->successNotificationTitle('Your streamer has been submitted for approval.')
+                    ->failureNotificationTitle('Failed to submit streamer.')
+                    ->action(function (Action $action, array $data) {
+                        try {
+                            Streamer::create([
+                                ...$data,
+                                'status' => StreamerStatus::PendingApproval,
+                                'is_live' => false,
+                            ]);
+
+                            $action->success();
+                        } catch (\Exception $e) {
+                            $action->failure();
+                        }
                     }),
             ]);
     }

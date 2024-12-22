@@ -8,8 +8,10 @@ use App\Models\Streamer;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\MaxWidth;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Collection;
 
 class StreamerResource extends Resource
 {
@@ -35,11 +37,13 @@ class StreamerResource extends Resource
                                 'twitch_username',
                                 ignoreRecord: true,
                             ),
-                        Forms\Components\Select::make('status')
+                        Forms\Components\ToggleButtons::make('status')
+                            ->inline()
                             ->required()
+                            ->grouped()
                             ->options(StreamerStatus::class)
                             ->default(StreamerStatus::PendingApproval),
-                    ])
+                    ]),
             ]);
     }
 
@@ -48,22 +52,62 @@ class StreamerResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
+                    ->weight('bold')
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('twitch_username')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->icon('heroicon-o-arrow-top-right-on-square')
+                    ->url(fn (Streamer $streamer) => 'https://www.twitch.tv/'.$streamer->twitch_username)
+                    ->openUrlInNewTab(),
                 Tables\Columns\TextColumn::make('status')
                     ->badge(),
             ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('status')
+                    ->multiple()
+                    ->options(StreamerStatus::class),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\ActionGroup::make([
+                        Tables\Actions\Action::make('approve')
+                            ->visible(fn (Streamer $streamer) => $streamer->status !== StreamerStatus::Approved)
+                            ->icon('heroicon-o-check-circle')
+                            ->color('success')
+                            ->requiresConfirmation()
+                            ->action(fn (Streamer $record) => $record->update([
+                                'status' => StreamerStatus::Approved,
+                            ])),
+                        Tables\Actions\Action::make('reject')
+                            ->visible(fn (Streamer $streamer) => $streamer->status !== StreamerStatus::Rejected)
+                            ->icon('heroicon-o-x-circle')
+                            ->color('danger')
+                            ->requiresConfirmation()
+                            ->action(fn (Streamer $record) => $record->update([
+                                'status' => StreamerStatus::Rejected,
+                            ])),
+                        Tables\Actions\EditAction::make()
+                            ->modalWidth(MaxWidth::Medium),
+                    ])->dropdown(false),
+                    Tables\Actions\DeleteAction::make(),
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\BulkAction::make('approve')
+                        ->requiresConfirmation()
+                        ->icon('heroicon-o-check-circle')
+                        ->color('success')
+                        ->action(function (Streamer $record, Collection $selectedRecords) {
+                            $selectedRecords->each(
+                                fn (Streamer $selectedRecord) => $selectedRecord->update([
+                                    'status' => StreamerStatus::Approved,
+                                ]),
+                            );
+                        })
+                        ->deselectRecordsAfterCompletion(),
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
@@ -80,8 +124,6 @@ class StreamerResource extends Resource
     {
         return [
             'index' => Pages\ListStreamers::route('/'),
-            'create' => Pages\CreateStreamer::route('/create'),
-            'edit' => Pages\EditStreamer::route('/{record}/edit'),
         ];
     }
 }

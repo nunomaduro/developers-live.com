@@ -11,4 +11,9 @@ class Category extends Model
     {
         return $this->hasMany(Streamer::class);
     }
+
+    public function dashedStreamerName(): string
+    {
+        return str_replace(' ', '-', strtolower($this->category_name));
+    }
 }

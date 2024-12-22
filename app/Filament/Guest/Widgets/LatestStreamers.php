@@ -7,6 +7,7 @@ use App\Models\Streamer;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
+use Filament\Support\Enums\MaxWidth;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Table;
@@ -30,7 +31,7 @@ class LatestStreamers extends BaseWidget
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('twitch_username')
-                    ->url(fn(Streamer $streamer) => 'https://www.twitch.tv/' . $streamer->twitch_username)
+                    ->url(fn (Streamer $streamer) => 'https://www.twitch.tv/'.$streamer->twitch_username)
                     ->openUrlInNewTab()
                     ->searchable()
                     ->sortable(),
@@ -38,6 +39,7 @@ class LatestStreamers extends BaseWidget
                     ->boolean(),
             ])->headerActions([
                 Action::make('Submit a Streamer')
+                    ->modalWidth(MaxWidth::Medium)
                     ->form([
                         Section::make()
                             ->icon('heroicon-o-microphone')
@@ -52,7 +54,7 @@ class LatestStreamers extends BaseWidget
                                         'streamers',
                                         'twitch_username',
                                     ),
-                            ])
+                            ]),
 
                     ])->action(function (array $data) {
                         Streamer::create([

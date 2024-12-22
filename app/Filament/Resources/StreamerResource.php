@@ -69,7 +69,11 @@ class StreamerResource extends Resource
                     ->label('Category type')
                     ->searchable()
                     ->sortable()
-                    ->url(fn (Streamer $streamer) => 'https://twitch.tv/directory/category/'.$streamer->category->dashedStreamerName())
+                    ->url(
+                        fn (Streamer $streamer) => $streamer->category
+                            ? 'https://twitch.tv/directory/category/'.$streamer->category->dashedCategoryName()
+                            : null
+                    )
                     ->openUrlInNewTab(),
                 Tables\Columns\TextColumn::make('status')
                     ->badge(),

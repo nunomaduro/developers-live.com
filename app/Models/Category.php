@@ -12,8 +12,12 @@ class Category extends Model
         return $this->hasMany(Streamer::class);
     }
 
-    public function dashedStreamerName(): string
+    public function dashedCategoryName(): string
     {
+        if ($this->category_name === null) {
+            return '';
+        }
+
         return str_replace(' ', '-', strtolower($this->category_name));
     }
 }

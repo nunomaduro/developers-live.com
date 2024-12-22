@@ -36,7 +36,7 @@ class LatestStreamers extends BaseWidget
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('category.category_name')
-                    ->url(fn (Streamer $streamer) => 'https://twitch.tv/directory/category/'.$streamer->category->dashedStreamerName())
+                    ->url(fn (Streamer $streamer) => 'https://twitch.tv/directory/category/'.$streamer->category->dashedCategoryName())
                     ->openUrlInNewTab()
                     ->searchable()
                     ->sortable(),

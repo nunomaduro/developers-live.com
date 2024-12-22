@@ -40,6 +40,7 @@ class StreamerResource extends Resource
                         Forms\Components\ToggleButtons::make('status')
                             ->inline()
                             ->required()
+                            ->grouped()
                             ->options(StreamerStatus::class)
                             ->default(StreamerStatus::PendingApproval),
                     ]),

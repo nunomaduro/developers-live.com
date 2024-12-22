@@ -10,7 +10,7 @@ Artisan::command('sync:streamers', function () {
     Streamer::query()
         ->where('status', StreamerStatus::Approved)
         ->each(function (Streamer $streamer) {
-            $url = 'https://www.twitch.tv/' . urlencode(
+            $url = 'https://www.twitch.tv/'.urlencode(
                 $streamer->twitch_username
             );
 
@@ -26,13 +26,13 @@ Artisan::command('sync:streamers-to-categories', function () {
     Streamer::query()
         ->where('status', StreamerStatus::Approved)
         ->each(function (Streamer $streamer) {
-            $url = 'https://api.twitch.tv/helix/search/channels?query=' . urlencode(
+            $url = 'https://api.twitch.tv/helix/search/channels?query='.urlencode(
                 $streamer->twitch_username
             );
 
             $streamerHttp = Http::withHeaders([
-                'Authorization' => 'Bearer ' . config('services.twitch.access_token'),
-                'Client-ID' => config('services.twitch.client_id')
+                'Authorization' => 'Bearer '.config('services.twitch.access_token'),
+                'Client-ID' => config('services.twitch.client_id'),
             ])->get($url);
 
             $streamerJson = $streamerHttp->json();

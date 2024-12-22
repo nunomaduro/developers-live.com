@@ -57,8 +57,7 @@ class CategoryResource extends Resource
                     ])->dropdown(false),
                     Tables\Actions\DeleteAction::make(),
                 ]),
-            ])
-            ->bulkActions([]);
+            ]);
     }
 
     public static function getRelations(): array
@@ -75,4 +74,3 @@ class CategoryResource extends Resource
         ];
     }
 }
-

@@ -63,13 +63,13 @@ class StreamerResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->icon('heroicon-o-arrow-top-right-on-square')
-                    ->url(fn(Streamer $streamer) => 'https://www.twitch.tv/' . $streamer->twitch_username)
+                    ->url(fn (Streamer $streamer) => 'https://www.twitch.tv/'.$streamer->twitch_username)
                     ->openUrlInNewTab(),
                 Tables\Columns\TextColumn::make('category.category_name')
                     ->label('Category type')
                     ->searchable()
                     ->sortable()
-                    ->url(fn(Streamer $streamer) => 'https://twitch.tv/directory/category/' . $streamer->category->dashedStreamerName())
+                    ->url(fn (Streamer $streamer) => 'https://twitch.tv/directory/category/'.$streamer->category->dashedStreamerName())
                     ->openUrlInNewTab(),
                 Tables\Columns\TextColumn::make('status')
                     ->badge(),
@@ -85,19 +85,19 @@ class StreamerResource extends Resource
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\ActionGroup::make([
                         Tables\Actions\Action::make('approve')
-                            ->visible(fn(Streamer $streamer) => $streamer->status !== StreamerStatus::Approved)
+                            ->visible(fn (Streamer $streamer) => $streamer->status !== StreamerStatus::Approved)
                             ->icon('heroicon-o-check-circle')
                             ->color('success')
                             ->requiresConfirmation()
-                            ->action(fn(Streamer $record) => $record->update([
+                            ->action(fn (Streamer $record) => $record->update([
                                 'status' => StreamerStatus::Approved,
                             ])),
                         Tables\Actions\Action::make('reject')
-                            ->visible(fn(Streamer $streamer) => $streamer->status !== StreamerStatus::Rejected)
+                            ->visible(fn (Streamer $streamer) => $streamer->status !== StreamerStatus::Rejected)
                             ->icon('heroicon-o-x-circle')
                             ->color('danger')
                             ->requiresConfirmation()
-                            ->action(fn(Streamer $record) => $record->update([
+                            ->action(fn (Streamer $record) => $record->update([
                                 'status' => StreamerStatus::Rejected,
                             ])),
                         Tables\Actions\EditAction::make()
@@ -114,7 +114,7 @@ class StreamerResource extends Resource
                         ->color('success')
                         ->action(function (Streamer $record, Collection $selectedRecords) {
                             $selectedRecords->each(
-                                fn(Streamer $selectedRecord) => $selectedRecord->update([
+                                fn (Streamer $selectedRecord) => $selectedRecord->update([
                                     'status' => StreamerStatus::Approved,
                                 ]),
                             );

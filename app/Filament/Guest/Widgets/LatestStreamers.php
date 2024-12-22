@@ -28,9 +28,11 @@ class LatestStreamers extends BaseWidget
             )
             ->columns([
                 Tables\Columns\TextColumn::make('name')
+                    ->label(__('Name'))
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('twitch_username')
+                    ->label(__('Twitch Username'))
                     ->url(fn (Streamer $streamer) => 'https://www.twitch.tv/'.$streamer->twitch_username)
                     ->openUrlInNewTab()
                     ->searchable()
@@ -41,19 +43,24 @@ class LatestStreamers extends BaseWidget
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\IconColumn::make('is_live')
+                    ->label(__('Live'))
                     ->boolean(),
             ])->headerActions([
                 Action::make('Submit a Streamer')
+                    ->label(__('Submit a Streamer'))
                     ->modalWidth(MaxWidth::Medium)
+                    ->icon('heroicon-o-microphone')
                     ->form([
                         Section::make()
                             ->icon('heroicon-o-microphone')
-                            ->heading('Streamer Information')
-                            ->description('Enter the streamer information')
+                            ->heading(__('Streamer Information'))
+                            ->description(__('Enter the streamer information'))
                             ->schema([
                                 TextInput::make('name')
+                                    ->label(__('Name'))
                                     ->required(),
                                 TextInput::make('twitch_username')
+                                    ->label(__('Twitch Username'))
                                     ->required()
                                     ->unique(
                                         'streamers',
@@ -69,7 +76,7 @@ class LatestStreamers extends BaseWidget
                         ]);
                     })->after(function () {
                         Notification::make()
-                            ->title('Your streamer has been submitted for approval.')
+                            ->title(__('Your streamer has been submitted for approval.'))
                             ->success()
                             ->send();
                     }),

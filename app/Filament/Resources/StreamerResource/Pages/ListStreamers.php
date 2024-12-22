@@ -6,9 +6,9 @@ use App\Enums\StreamerStatus;
 use App\Filament\Resources\StreamerResource;
 use App\Models\Streamer;
 use Filament\Actions;
+use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Support\Enums\MaxWidth;
-use Filament\Resources\Components\Tab;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 

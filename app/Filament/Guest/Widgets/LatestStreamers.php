@@ -37,6 +37,11 @@ class LatestStreamers extends BaseWidget
                     ->openUrlInNewTab()
                     ->searchable()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('category.category_name')
+                    ->url(fn (Streamer $streamer) => 'https://twitch.tv/directory/category/'.$streamer->category->dashedCategoryName())
+                    ->openUrlInNewTab()
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\IconColumn::make('is_live')
                     ->label(__('Live'))
                     ->boolean(),

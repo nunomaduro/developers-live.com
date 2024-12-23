@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\StreamerStatus;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Streamer extends Model
 {
@@ -15,5 +16,10 @@ class Streamer extends Model
         return [
             'status' => StreamerStatus::class,
         ];
+    }
+
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(Category::class);
     }
 }

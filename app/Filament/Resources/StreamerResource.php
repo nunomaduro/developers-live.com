@@ -22,6 +22,8 @@ class StreamerResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-microphone';
 
+    protected static ?int $navigationSort = 1;
+
     public static function form(Form $form): Form
     {
         return $form
@@ -42,6 +44,8 @@ class StreamerResource extends Resource
                                 'twitch_username',
                                 ignoreRecord: true,
                             ),
+                        Forms\Components\Select::make('category_id')
+                            ->relationship('category', 'category_name'),
                         Forms\Components\ToggleButtons::make('status')
                             ->label(__('Status'))
                             ->inline()
@@ -69,6 +73,16 @@ class StreamerResource extends Resource
                     ->icon('heroicon-o-arrow-top-right-on-square')
                     ->url(fn (Streamer $streamer) => 'https://www.twitch.tv/'.$streamer->twitch_username)
                     ->openUrlInNewTab(),
+                Tables\Columns\TextColumn::make('category.category_name')
+                    ->label('Category type')
+                    ->searchable()
+                    ->sortable()
+                    ->url(
+                        fn (Streamer $streamer) => $streamer->category
+                            ? 'https://twitch.tv/directory/category/'.$streamer->category->dashedCategoryName()
+                            : null
+                    )
+                    ->openUrlInNewTab(),
                 Tables\Columns\TextColumn::make('status')
                     ->label(__('Status'))
                     ->badge(),
@@ -78,6 +92,8 @@ class StreamerResource extends Resource
                     ->label(__('Status'))
                     ->multiple()
                     ->options(StreamerStatus::class),
+                Tables\Filters\SelectFilter::make('Category type')
+                    ->relationship('category', 'category_name'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make()

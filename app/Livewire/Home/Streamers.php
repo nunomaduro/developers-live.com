@@ -77,9 +77,8 @@ class Streamers extends Component implements HasActions, HasForms, HasTable
             ->label(__('View'))
             ->icon('hugeicons-arrow-up-right-01')
             ->outlined()
-            ->openUrlInNewTab()
             ->color(fn (array $arguments) => $arguments['live'] ? 'primary' : 'gray')
-            ->url(fn (array $arguments) => 'https://www.twitch.tv/'.$arguments['username']);
+            ->url(fn (array $arguments) => 'https://www.twitch.tv/'.$arguments['username'], true);
     }
 
     public function newStreamerAction(): Action

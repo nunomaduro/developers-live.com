@@ -17,9 +17,4 @@
             ]) }}
         </div>
     </div>
-    <div class="flex items-center justify-end pt-2">
-        <x-filament::badge icon="hugeicons-voice" :color="$getRecord()->is_live ? 'primary' : 'gray'">
-            {{ $getRecord()->is_live ? __('live') : __('offline') }}
-        </x-filament::badge>
-    </div>
 </div>

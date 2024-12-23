@@ -64,6 +64,10 @@ class Streamers extends Component implements HasActions, HasForms, HasTable
             ->contentGrid([
                 'md' => 2,
                 'lg' => 3,
+            ])
+            ->filters([
+                Tables\Filters\TernaryFilter::make('is_live')
+                    ->label(__('Live')),
             ]);
     }
 

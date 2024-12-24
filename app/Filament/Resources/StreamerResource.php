@@ -42,11 +42,10 @@ class StreamerResource extends Resource
                                 'twitch_username',
                                 ignoreRecord: true,
                             ),
-                        Forms\Components\ToggleButtons::make('status')
+                        Forms\Components\Select::make('status')
                             ->label(__('Status'))
-                            ->inline()
                             ->required()
-                            ->grouped()
+                            ->native(false)
                             ->options(StreamerStatus::class)
                             ->default(StreamerStatus::PendingApproval),
                     ]),

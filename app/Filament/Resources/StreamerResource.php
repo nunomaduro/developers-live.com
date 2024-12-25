@@ -5,8 +5,11 @@ namespace App\Filament\Resources;
 use App\Enums\StreamerStatus;
 use App\Filament\Resources\StreamerResource\Pages;
 use App\Models\Streamer;
+use App\Services\TwitchService;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Infolists\Components\Group;
+use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
@@ -14,6 +17,7 @@ use Filament\Resources\Resource;
 use Filament\Support\Enums\MaxWidth;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 
 class StreamerResource extends Resource
@@ -57,18 +61,30 @@ class StreamerResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\ImageColumn::make('avatar_url')
+                    ->label(__('Avatar'))
+                    ->circular()
+                    ->defaultImageUrl(fn (Streamer $record): string => "https://ui-avatars.com/api/?name={$record->name}&color=FFFFFF&background=09090b"),
+
                 Tables\Columns\TextColumn::make('name')
                     ->label(__('Name'))
                     ->weight('bold')
                     ->searchable()
                     ->sortable(),
+
                 Tables\Columns\TextColumn::make('twitch_username')
                     ->label(__('Twitch Username'))
                     ->searchable()
                     ->sortable()
                     ->icon('heroicon-o-arrow-top-right-on-square')
-                    ->url(fn (Streamer $streamer) => 'https://www.twitch.tv/'.$streamer->twitch_username)
-                    ->openUrlInNewTab(),
+                    ->url(fn (Streamer $streamer) => 'https://www.twitch.tv/'.$streamer->twitch_username, shouldOpenInNewTab: true),
+
+                Tables\Columns\TextColumn::make('description')
+                    ->label(__('Description'))
+                    ->limit(50)
+                    ->html()
+                    ->wrap(),
+
                 Tables\Columns\TextColumn::make('status')
                     ->label(__('Status'))
                     ->badge(),
@@ -81,7 +97,15 @@ class StreamerResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
-                    ->modalWidth(MaxWidth::Medium),
+                    ->modalWidth(MaxWidth::Medium)
+                    ->after(function (Streamer $record, TwitchService $twitchService) {
+
+                        if (Arr::get($record->getChanges(), 'status') === 'approved') {
+
+                            $profileData = $twitchService->getProfileData($record->twitch_username);
+                            $record->update($profileData);
+                        }
+                    }),
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\ActionGroup::make([
                         Tables\Actions\Action::make('approve')
@@ -90,9 +114,13 @@ class StreamerResource extends Resource
                             ->icon('heroicon-o-check-circle')
                             ->color('success')
                             ->requiresConfirmation()
-                            ->action(fn (Streamer $record) => $record->update([
-                                'status' => StreamerStatus::Approved,
-                            ])),
+                            ->action(function (Streamer $record, TwitchService $twitchService) {
+
+                                $data = $twitchService->getProfileData($record->twitch_username);
+                                $data['status'] = StreamerStatus::Approved;
+                                $record->update($data);
+
+                            }),
                         Tables\Actions\Action::make('reject')
                             ->label(__('Reject'))
                             ->visible(fn (Streamer $streamer) => $streamer->status !== StreamerStatus::Rejected)
@@ -123,6 +151,20 @@ class StreamerResource extends Resource
                             );
                         })
                         ->deselectRecordsAfterCompletion(),
+                    Tables\Actions\BulkAction::make('updateProfile')
+                        ->label(__('Update Profile'))
+                        ->requiresConfirmation()
+                        ->icon('heroicon-o-arrow-path')
+                        ->color('primary')
+                        ->action(function (Streamer $record, Collection $selectedRecords, TwitchService $twitchService) {
+                            $selectedRecords->each(
+                                fn (Streamer $selectedRecord) => $selectedRecord->update(
+                                    $twitchService->getProfileData($selectedRecord->twitch_username),
+                                ),
+                            );
+                        })
+                        ->deselectRecordsAfterCompletion(),
+
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
@@ -135,13 +177,29 @@ class StreamerResource extends Resource
                 Section::make(self::getLabel().' Details')
                     ->icon(self::$navigationIcon)
                     ->schema([
-                        TextEntry::make('name')
-                            ->label(__('Name')),
-                        TextEntry::make('twitch_username')
-                            ->label(__('Twitch Username'))
-                            ->icon('heroicon-o-arrow-top-right-on-square')
-                            ->url(fn (Streamer $streamer) => 'https://www.twitch.tv/'.$streamer->twitch_username)
-                            ->openUrlInNewTab(),
+                        Group::make([
+                            ImageEntry::make('avatar_url')
+                                ->label(__('Avatar'))
+                                ->hiddenLabel()
+                                ->size('sm')
+                                ->circular()
+                                ->width('100px')
+                                ->defaultImageUrl(fn (Streamer $record): string => "https://ui-avatars.com/api/?name={$record->name}&color=FFFFFF&background=09090b"),
+                            TextEntry::make('name')
+                                ->label(__('Name')),
+                            TextEntry::make('twitch_username')
+                                ->label(__('Twitch Username'))
+                                ->icon('heroicon-o-arrow-top-right-on-square')
+                                ->url(fn (Streamer $streamer) => 'https://www.twitch.tv/'.$streamer->twitch_username, shouldOpenInNewTab: true),
+                        ])
+                            ->columnSpanFull()
+                            ->columns(3),
+
+                        TextEntry::make('description')
+                            ->label(__('Description'))
+                            ->prose()
+                            ->columnSpanFull(),
+
                         TextEntry::make('status')
                             ->label(__('Status'))
                             ->badge()

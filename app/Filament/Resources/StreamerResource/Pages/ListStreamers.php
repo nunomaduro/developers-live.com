@@ -5,6 +5,7 @@ namespace App\Filament\Resources\StreamerResource\Pages;
 use App\Enums\StreamerStatus;
 use App\Filament\Resources\StreamerResource;
 use App\Models\Streamer;
+use App\Services\TwitchService;
 use Filament\Actions;
 use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
@@ -21,9 +22,14 @@ class ListStreamers extends ListRecords
         return [
             Actions\CreateAction::make()
                 ->modalWidth(MaxWidth::Medium)
-                ->mutateFormDataUsing(function (array $data) {
+                ->mutateFormDataUsing(function (array $data, TwitchService $twitchService) {
+
+                    $profileData = $twitchService->getProfileData($data['twitch_username']);
+
                     return array_merge($data, [
                         'is_live' => false,
+                        'avatar_url' => $profileData['avatar_url'],
+                        'description' => $profileData['description'],
                     ]);
                 }),
         ];

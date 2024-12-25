@@ -77,7 +77,7 @@ class StreamerResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->icon('heroicon-o-arrow-top-right-on-square')
-                    ->url(fn (Streamer $streamer) => 'https://www.twitch.tv/'.$streamer->twitch_username, shouldOpenInNewTab: true),
+                    ->url(fn (Streamer $streamer) => config('twitch.url').$streamer->twitch_username, shouldOpenInNewTab: true),
 
                 Tables\Columns\TextColumn::make('description')
                     ->label(__('Description'))
@@ -190,7 +190,7 @@ class StreamerResource extends Resource
                             TextEntry::make('twitch_username')
                                 ->label(__('Twitch Username'))
                                 ->icon('heroicon-o-arrow-top-right-on-square')
-                                ->url(fn (Streamer $streamer) => 'https://www.twitch.tv/'.$streamer->twitch_username, shouldOpenInNewTab: true),
+                                ->url(fn (Streamer $streamer) => config('twitch.url').$streamer->twitch_username, shouldOpenInNewTab: true),
                         ])
                             ->columnSpanFull()
                             ->columns(3),

@@ -6,7 +6,7 @@ use Filament\Support\Contracts\HasColor;
 use Filament\Support\Contracts\HasIcon;
 use Filament\Support\Contracts\HasLabel;
 
-enum StreamerStatus: string implements HasColor, HasLabel, HasIcon
+enum StreamerStatus: string implements HasColor, HasIcon, HasLabel
 {
     case PendingApproval = 'pending_approval';
     case Rejected = 'rejected';
@@ -35,7 +35,7 @@ enum StreamerStatus: string implements HasColor, HasLabel, HasIcon
             self::Approved => 'success',
         };
     }
-    
+
     /**
      * Get the icon for the enum value.
      */
@@ -47,5 +47,4 @@ enum StreamerStatus: string implements HasColor, HasLabel, HasIcon
             self::Approved => 'heroicon-o-check-circle',
         };
     }
-    
 }

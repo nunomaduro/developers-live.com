@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Enums\StreamerStatus;
 use App\Filament\Resources\StreamerResource\Pages;
 use App\Models\Streamer;
+use App\Rules\TwitchUsernameRule;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\Section;
@@ -40,6 +41,9 @@ class StreamerResource extends Resource
                                 Forms\Components\TextInput::make('twitch_username')
                                     ->label(__('Twitch Username'))
                                     ->required()
+                                    ->rules([
+                                        new TwitchUsernameRule
+                                    ])
                                     ->unique(
                                         'streamers',
                                         'twitch_username',

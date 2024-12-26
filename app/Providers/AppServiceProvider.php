@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Services\TwitchService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\ServiceProvider;
 
@@ -20,6 +21,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $this->app->singleton(TwitchService::class, fn() => TwitchService::make());
         Model::unguard();
     }
 }

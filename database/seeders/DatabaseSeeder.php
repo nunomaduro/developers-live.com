@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Enums\StreamerStatus;
+use App\Models\Streamer;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -17,6 +19,14 @@ class DatabaseSeeder extends Seeder
             'name' => 'Nuno Maduro',
             'email' => 'enunomaduro@gmail.com',
             'password' => bcrypt('enunomaduro@gmail.com'),
+        ]);
+
+        Streamer::create([
+            'name' => 'Nuno Maduro',
+            'twitch_id' => '139973107',
+            'twitch_username' => 'enunomaduro',
+            'status' => StreamerStatus::Approved,
+            'is_live' => true,
         ]);
     }
 }

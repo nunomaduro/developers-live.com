@@ -15,8 +15,9 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('twitch_username')->unique();
+            $table->string('twitch_id')->nullable()->unique();
             $table->string('status');
-            $table->boolean('is_live');
+            $table->boolean('is_live')->default(false);
             $table->timestamps();
         });
     }

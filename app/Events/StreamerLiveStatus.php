@@ -18,13 +18,12 @@ class StreamerLiveStatus implements ShouldBroadcast
         public ?string $broadcaster_user_name,
         public ?string $type,
         public ?Carbon $started_at,
-    ) {
-    }
+    ) {}
 
     public function broadcastOn(): array
     {
         return [
-            new Channel('streamers-live-status')
+            new Channel('streamers-live-status'),
         ];
     }
 }

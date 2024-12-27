@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Facades\Twitch;
+use App\Services\TwitchService;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,7 +16,7 @@ class TwitchCallbackMiddleware
 
     public function handle(Request $request, Closure $next): Response
     {
-        $secret = Twitch::getCallbackSecret();
+        $secret = app(TwitchService::class)->getCallbackSecret();
 
         $messageId = $request->header(self::TWITCH_MESSAGE_ID);
         $timestamp = $request->header(self::TWITCH_MESSAGE_TIMESTAMP);

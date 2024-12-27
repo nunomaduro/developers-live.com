@@ -25,8 +25,8 @@ class DatabaseSeeder extends Seeder
             'name' => 'Nuno Maduro',
             'twitch_id' => '139973107',
             'twitch_username' => 'enunomaduro',
-            'status' => StreamerStatus::Approved,
-            'is_live' => true,
+            'status' => StreamerStatus::PendingApproval,
+            'is_live' => false,
         ]);
     }
 }

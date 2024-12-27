@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Http\Resources\CreateEventSubResource;
 use App\Services\Enums\EventSub;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Cache;
@@ -10,9 +9,6 @@ use Illuminate\Support\Facades\Http;
 
 class TwitchService
 {
-    protected const ID_URL = 'https://id.twitch.tv/oauth2/token';
-    protected const API_URL = 'https://api.twitch.tv/helix/';
-
     protected function __construct(
         protected ?string $client_id,
         protected ?string $client_secret,
@@ -33,11 +29,14 @@ class TwitchService
     public function scopes(string $scopes): static
     {
         $this->scopes = $scopes;
+
         return $this;
     }
 
     protected function getRequest(): PendingRequest
     {
+        $this->fetchAccessToken();
+
         return Http::withHeaders([
             'Authorization' => 'Bearer '.$this->access_token,
             'Client-Id' => $this->client_id,
@@ -55,12 +54,12 @@ class TwitchService
 
     public function fetchAccessToken(): void
     {
-        if (!$this->client_id || !$this->client_secret) {
+        if (! $this->client_id || ! $this->client_secret) {
             throw new \Exception('Twitch client id or secret not set.');
         }
 
-        if (!Cache::has('twitch:accessToken')) {
-            $response = Http::post(self::ID_URL, [
+        if (! Cache::has('twitch:accessToken')) {
+            $response = Http::post(config('twitch.url.auth'), [
                 'client_id' => $this->client_id,
                 'client_secret' => $this->client_secret,
                 'grant_type' => 'client_credentials',
@@ -68,15 +67,14 @@ class TwitchService
 
             $this->access_token = Cache::remember(
                 'twitch:accessToken',
-                now()->addMillis($response['expires_in']),
-                fn() => $response['access_token'] ?? null,
+                now()->addMillis($response['expires_in'] ?? 5),
+                fn () => $response['access_token'] ?? null,
             );
+        } else {
+            $this->access_token = Cache::get('twitch:accessToken');
         }
     }
 
-    /**
-     * @return string|null
-     */
     public function getAccessToken(): ?string
     {
         return $this->access_token;
@@ -86,16 +84,23 @@ class TwitchService
     {
         return Cache::rememberForever(
             "twitch:broadcaster:$username",
-            fn() => $this->getRequest()->get(self::API_URL.'users', [
+            fn () => $this->getRequest()->get(config('twitch.url.api').'/users', [
                 'login' => $username,
             ])->json('data.0.id')
         );
     }
 
+    public function checkUsernameExists(string $username): bool
+    {
+        return ! empty($this->getRequest()->get(config('twitch.url.api').'/users', [
+            'login' => $username,
+        ])->json('data'));
+    }
+
     protected function createSubscription(EventSub $eventSub, array $condition): array
     {
         return $this->getRequest()
-            ->post(self::API_URL.'eventsub/subscriptions', [
+            ->post(config('twitch.url.api').'/eventsub/subscriptions', [
                 'type' => $eventSub->value,
                 'version' => $eventSub->getVersion(),
                 'condition' => $condition,
@@ -103,23 +108,27 @@ class TwitchService
             ])->json('data.0');
     }
 
-    public function subscribe(EventSub $eventSub, string $username): bool
+    public function subscribe(EventSub $eventSub, string $username): ?string
     {
         $broadcasterId = $this->getBroadcasterId($username);
 
-        $response = $this->createSubscription($eventSub, [
-            'broadcaster_user_id' => $broadcasterId,
-        ]);
+        return Cache::rememberForever("twitch:$broadcasterId:subscriptions:$eventSub->value", function () use ($eventSub, $username, $broadcasterId) {
+            $response = $this->createSubscription($eventSub, [
+                'broadcaster_user_id' => $broadcasterId,
+            ]);
 
-        Cache::rememberForever("twitch:$broadcasterId:subscriptions:$eventSub->value", fn() => $response['id']);
+            if (! $response) {
+                throw new \Exception('Could not subscribe to event', [$eventSub, $username, $broadcasterId, $response]);
+            }
 
-        return true;
+            return $response['id'];
+        });
     }
 
     protected function deleteSubscription(string $subscriptionId): bool
     {
         return $this->getRequest()
-            ->delete(self::API_URL.'eventsub/subscriptions', [
+            ->delete(config('twitch.url.api').'/eventsub/subscriptions', [
                 'id' => $subscriptionId,
             ])->noContent();
     }
@@ -127,6 +136,7 @@ class TwitchService
     public function unsubscribe(EventSub $eventSub, string $username): bool
     {
         $subscriptionId = Cache::get("twitch:$username:subscriptions:$eventSub->value");
+
         return $this->deleteSubscription($subscriptionId);
     }
 
@@ -134,5 +144,4 @@ class TwitchService
     {
         return config('twitch.callback.secret');
     }
-
 }

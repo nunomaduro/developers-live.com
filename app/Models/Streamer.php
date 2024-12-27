@@ -3,25 +3,28 @@
 namespace App\Models;
 
 use App\Enums\StreamerStatus;
-use App\Facades\Twitch;
+use App\Events\StreamerApprovedEvent;
 use Illuminate\Database\Eloquent\Model;
-use function Illuminate\Events\queueable;
 
 class Streamer extends Model
 {
-
     protected static function booted()
     {
-        self::created(queueable(function (self $streamer) {
-            $twitch_id =  Twitch::getBroadcasterId($streamer->twitch_username);
+        static::updated(function (Streamer $streamer) {
 
-            if (!$twitch_id) {
-                throw new \Exception('Could not find broadcaster id');
+            if (array_key_exists('status', $streamer->getChanges())
+                && $streamer->getChanges()['status'] === StreamerStatus::Approved->value) {
+                StreamerApprovedEvent::dispatch($streamer);
             }
 
-            $streamer->twitch_id = $twitch_id;
-            $streamer->save();
-        }));
+        });
+        static::created(function (Streamer $streamer) {
+
+            if ($streamer->status === StreamerStatus::Approved) {
+                StreamerApprovedEvent::dispatch($streamer);
+            }
+
+        });
     }
 
     /**
@@ -33,5 +36,4 @@ class Streamer extends Model
             'status' => StreamerStatus::class,
         ];
     }
-
 }

@@ -178,7 +178,6 @@ class TwitchService
         $response = $this->createSubscription($eventSub, [
             'broadcaster_user_id' => $broadcasterId,
         ]);
-
         if (! $response || ! array_key_exists('id', $response)) {
             throw new \Exception('Could not subscribe to event',
                 [$eventSub, $username, $broadcasterId, $response]);

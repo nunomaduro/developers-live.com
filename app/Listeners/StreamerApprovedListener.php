@@ -26,17 +26,15 @@ class StreamerApprovedListener implements ShouldQueue
         $username = $event->streamer->twitch_username;
         $twitch_id = $this->service->getBroadcasterId($username);
 
-        if (! $twitch_id) {
+        if (!$twitch_id) {
             throw new \Exception('Could not find broadcaster id');
         }
 
-        $event->streamer->twitch_id = $twitch_id;
+        $event->streamer->update(['twitch_id' => $twitch_id]);
 
-        $this->service->subscribe(EventSub::StreamOnline, $username);
-        $this->service->subscribe(EventSub::StreamOffline, $username);
-
-        Log::debug("Subscribed to stream online and offline events for $username");
-
-        $event->streamer->save();
+        if ($this->service->subscribe(EventSub::StreamOnline, $username)
+            && $this->service->subscribe(EventSub::StreamOffline, $username)) {
+            Log::debug("Subscribed to stream online and offline events for $username");
+        }
     }
 }

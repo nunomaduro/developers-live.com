@@ -20,7 +20,7 @@ class ListStreamers extends ListRecords
     {
         return [
             Actions\CreateAction::make()
-                ->modalWidth(MaxWidth::Medium)
+                ->modalWidth(MaxWidth::ScreenMedium)
                 ->mutateFormDataUsing(function (array $data) {
                     return array_merge($data, [
                         'is_live' => false,

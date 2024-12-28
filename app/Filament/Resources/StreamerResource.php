@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Enums\StreamerStatus;
 use App\Filament\Resources\StreamerResource\Pages;
 use App\Models\Streamer;
+use App\Rules\TwitchUsernameRule;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\Section;
@@ -31,24 +32,29 @@ class StreamerResource extends Resource
                     ->heading(__('Streamer Information'))
                     ->description(__('Enter the streamer information'))
                     ->schema([
-                        Forms\Components\TextInput::make('name')
-                            ->label(__('Name'))
-                            ->required(),
-                        Forms\Components\TextInput::make('twitch_username')
-                            ->label(__('Twitch Username'))
-                            ->required()
-                            ->unique(
-                                'streamers',
-                                'twitch_username',
-                                ignoreRecord: true,
-                            ),
-                        Forms\Components\ToggleButtons::make('status')
+                        Forms\Components\Grid::make()
+                            ->columns(['default' => 1, 'sm' => 2])
+                            ->schema([
+                                Forms\Components\TextInput::make('name')
+                                    ->label(__('Name'))
+                                    ->required(),
+                                Forms\Components\TextInput::make('twitch_username')
+                                    ->label(__('Twitch Username'))
+                                    ->required()
+                                    ->rules([
+                                        new TwitchUsernameRule
+                                    ])
+                                    ->unique(
+                                        'streamers',
+                                        'twitch_username',
+                                        ignoreRecord: true,
+                                    ),
+                            ]),
+                        Forms\Components\Radio::make('status')
                             ->label(__('Status'))
-                            ->inline()
                             ->required()
-                            ->grouped()
-                            ->options(StreamerStatus::class)
-                            ->default(StreamerStatus::PendingApproval),
+                            ->default(StreamerStatus::PendingApproval)
+                            ->options(StreamerStatus::class),
                     ]),
             ]);
     }
@@ -81,7 +87,7 @@ class StreamerResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
-                    ->modalWidth(MaxWidth::Medium),
+                    ->modalWidth(MaxWidth::ScreenMedium),
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\ActionGroup::make([
                         Tables\Actions\Action::make('approve')

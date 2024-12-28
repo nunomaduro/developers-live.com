@@ -43,7 +43,7 @@ class LatestStreamers extends BaseWidget
             ])->headerActions([
                 Action::make('Submit a Streamer')
                     ->label(__('Submit a Streamer'))
-                    ->modalWidth(MaxWidth::Medium)
+                    ->modalWidth(MaxWidth::ScreenMedium)
                     ->icon('heroicon-o-microphone')
                     ->form([
                         Section::make()

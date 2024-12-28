@@ -73,6 +73,19 @@ class TwitchWebhookController extends Controller
     {
         $challenge = $request->get('challenge');
 
+        if ($request->has('subscription')) {
+            $subscription = $request->get('subscription');
+
+            if (array_key_exists('id', $subscription)) {
+                EventSubscription::query()
+                    ->where('subscription_id', $subscription['id'])
+                    ->update([
+                        'status' => 'enabled',
+                    ]);
+                Log::debug("Twitch subscription with id \"{$subscription['id']}\" has been enabled");
+            }
+        }
+
         return response(
             $challenge,
             Response::HTTP_OK,

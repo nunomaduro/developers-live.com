@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\StreamerStatus;
 use App\Events\StreamerApprovedEvent;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Streamer extends Model
 {
@@ -35,5 +36,10 @@ class Streamer extends Model
         return [
             'status' => StreamerStatus::class,
         ];
+    }
+
+    public function eventSubscriptions(): HasMany
+    {
+        return $this->hasMany(EventSubscription::class, 'broadcaster_id', 'twitch_id');
     }
 }

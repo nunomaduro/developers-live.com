@@ -8,6 +8,9 @@ enum EventSub: string
     case StreamOnline = 'stream.online';
     case StreamOffline = 'stream.offline';
 
+    /**
+     * @return int the version of the event
+     */
     public function getVersion(): int
     {
         return match ($this) {
@@ -15,5 +18,4 @@ enum EventSub: string
             self::StreamOffline, self::StreamOnline => 1,
         };
     }
-
 }

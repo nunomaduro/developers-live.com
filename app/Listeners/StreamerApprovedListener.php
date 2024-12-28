@@ -8,6 +8,10 @@ use App\Services\TwitchService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * Listener handles logic when a streamer is approved. It subscribes the streamer to Twitch
+ * event notifications and updates their Twitch ID in the database.
+ */
 class StreamerApprovedListener implements ShouldQueue
 {
     protected TwitchService $service;

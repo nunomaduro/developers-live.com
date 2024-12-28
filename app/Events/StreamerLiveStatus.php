@@ -7,6 +7,9 @@ use Illuminate\Broadcasting\Channel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 
+/**
+ * Event class that indicates the live status of a streamer.
+ */
 class StreamerLiveStatus implements ShouldBroadcast
 {
     use Dispatchable;

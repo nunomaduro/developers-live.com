@@ -32,9 +32,10 @@ class Streamers extends Component implements HasActions, HasForms, HasTable
         return $table
             ->poll('10s')
             ->paginationPageOptions([12, 24, 48, 'all'])
-            ->defaultSort(fn (Builder $query, string $direction) => $query
-                ->orderBy('is_live', 'desc')
-                ->orderBy('name', 'asc')
+            ->defaultSort(
+                fn (Builder $query, string $direction) => $query
+                    ->orderBy('is_live', 'desc')
+                    ->orderBy('name', 'asc')
             )
             ->query(
                 Streamer::query()
@@ -54,6 +55,12 @@ class Streamers extends Component implements HasActions, HasForms, HasTable
                                     ->weight('bold'),
                                 Tables\Columns\TextColumn::make('twitch_username')
                                     ->label(__('Twitch Username'))
+                                    ->searchable()
+                                    ->sortable()
+                                    ->color('gray'),
+                                Tables\Columns\TextColumn::make('total_followers')
+                                    ->label(__('Total Followers'))
+                                    ->formatStateUsing(fn ($state) => "Total Followers: $state")
                                     ->searchable()
                                     ->sortable()
                                     ->color('gray'),
